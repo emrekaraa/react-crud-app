@@ -1,25 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
+import Loading from "./components/ui/Loading";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Row } from "antd";
 
-function App() {
+import UserCard from "./components/ui/UserCard";
+
+const App = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    setTimeout(async () => {
+      try {
+        const res = await axios.get(
+          "https://jsonplaceholder.typicode.com/users"
+        );
+        setUsers(res.data);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    }, [1500]);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      {loading ? (
+        <Loading />
+      ) : (
+        <Row>
+          {users.map((user) => {
+            return (
+              <UserCard
+                key={user?.id}
+                user={user}
+                users={users}
+                setUsers={setUsers}
+              />
+            );
+          })}
+        </Row>
+      )}
+    </>
   );
-}
+};
 
 export default App;
